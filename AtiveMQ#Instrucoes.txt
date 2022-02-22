@@ -1,0 +1,6 @@
+* https://activemq.apache.org/components/classic/download/
+* Executar prompt no modo admin e executar
+  C:\Program Files\apache-activemq-5.16.2\bin\win64\InstallService.bat
+* EM service, Iniciar serviço ActiveMQ  
+* http://localhost:8161/admin/queues.jsp
+* user: admin / password: admin

@@ -1,0 +1,133 @@
+
+<!-- Exemplo de Implementação Dynamodb + Spring -->
+
+<!-- DynamoDB -->
+
+<dependency>
+	<groupId>br.com.meudomino.quick.core</groupId>
+	<artifactId>core-aws-dynamodb</artifactId>
+	<version></version>
+</dependency>
+
+<dependency>
+	<groupId>com.github.derjust</groupId>
+	<artifactId>spring-data-dynamodb</artifactId>
+	<version>5.1.0</version>
+</dependency>
+
+---------------------- DynamoDbConfig ----------------------
+
+@Configuration
+@EnableDynamoDBRepositories(basePackages = "br.com.portal.employer.repository")
+public class DynamoDbConfig {
+
+	//@Value("${amazon.dynamodb.endpoint:http://localhost:8000}")
+	@Value("${amazon.dynamodb.endpoint:https://dynamodb.sa-east-1.amazonaws.com}")
+	private String dynamoDbEndpoint;
+	
+	@Value("${amazon.region:sa-east-1}")
+	private String regionAws;
+	
+	@Bean
+	@Primary
+	public AmazonDynamoDB amazonDynamoDB(){
+		
+		return AmazonDynamoDBClientBuilder.standard()
+			.withEndpointConfiguration(
+				new AwsClientBuilder.EndpointConfiguration(dynamoDbEndpoint, regionAws))
+			.build();
+	}
+	
+	@Bean
+	@Primary
+	public DynamoDBMapperConfig dynamoDBMapperConfig(){return DynamoDBMapperConfig.DEFAULT;}
+	
+	@Bean
+	@Primary
+	public DynamoDBMapper dynamoDBMapper(AmazonDynamoDB amazonDynamoDB, DynamoDBMapperConfig config){
+		return new DynamoDBMapper(amazonDynamoDB, config);
+	}
+}
+
+
+---------------------- application.yml ----------------------
+
+spring:
+	main:
+		allow-bean-definition-overriding: true
+
+
+---------------------- EmployeeEntity ----------------------
+
+@Entity
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@IdClass(Employee.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@DynamoDBTable(tableName = "tabela_employee")
+public class EmployeeEntity implements Serializable {
+
+	@Id
+	@JsonProperty("cod_employee")
+	private String codEmployee;
+	
+	@Id
+	@JsonProperty("nome_employee")
+	private String nomeEmployee;
+	
+	@Lob
+	@JsonProperty("texto_employee")
+	private EmployeeModel textoEmployee;
+	
+	@DynamoDBHashKey(attributeName = "cod_ambi_apli")
+	public String getCodEmployee(){return codEmployee;}
+	
+	@DynamoDBRangeKey(attributeName = "nom_empl_apli")
+	public String getNomeEmployee(){return nomeEmployee;}
+	
+	@DynamoDBAttribute(attributeName = "txt_empl_apli")
+	public EmployeeModel getTextoEmployee(){return textoEmployee;}
+	
+	public void setCodEmployee(String codEmployee){this.codEmployee = codEmployee;}
+	
+	public void setNomeEmployee(String nomeEmployee){this.nomeEmployee = nomeEmployee;}
+	
+	public void setTextoEmployee(EmployeeModel textoEmployee){this.textoEmployee = textoEmployee;}
+}
+
+
+---------------------- EmployeeRepository ----------------------
+
+@EnableScan
+public interface EmployeeRepository extends CrudRepository<EmployeeEntity, String> {
+
+	List<EmployeeEntity> findAll();
+	
+	List<EmployeeEntity> findByCodEmployee(String codEmployee);
+	
+	EmployeeEntity findByCodEmployeeAndNomeEmployee(String codEmployee, String nomeEmployee);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

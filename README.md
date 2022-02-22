@@ -69,9 +69,9 @@ Command compiler `tsc -w`
 `Entrar na Branch:` <br/>
 `git checkout develop` <br/>
 `Criar nova Branch:` <br/>
-`git checkout -b feature-H6182-T7008-T7009` <br/>
+`git checkout -b feature/primeira-feature` <br/>
 `Atualizar Branch:` <br/>
-`feature-H6182-T7008-T7009 >` <br/>
+`feature/primeira-feature >` <br/>
 `git pull origin develop` <br/>
 
 `Encontrar e Remover Artefato de Commit:` <br/>
